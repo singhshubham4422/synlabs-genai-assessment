@@ -244,3 +244,204 @@ Retrieval was slightly weaker (Hit Rate 0.90, MRR 0.85) while generation was nea
 
 **What single change would most improve answer quality?**
 Adding a reranker (e.g. `cross-encoder/ms-marco-MiniLM-L-6-v2`) between retrieval and generation. The bi-encoder embedding model used here optimizes for recall, not precision. A cross-encoder reranker would improve the quality of the top-3 chunks passed to the LLM.
+
+---
+
+---
+
+# Problem 2 — LLM-as-Judge Evaluation Pipeline
+
+## Overview
+
+A systematic pipeline for using LLMs to evaluate LLM-generated outputs at scale — with built-in bias detection, mitigation, and judge validation. The pipeline accepts a test suite in JSON/YAML, runs structured multi-criterion judging, measures four categories of judge bias, validates judge reliability, and declares A/B winners between competing configurations.
+
+The core thesis: LLM judges are powerful but systematically biased. Naming, measuring, and mitigating those biases in code — not just in prose — is what makes them trustworthy enough to gate a release.
+
+---
+
+## Tech Stack
+
+| Component | Choice | Justification |
+|---|---|---|
+| Judge LLM | Gemini 3.5 Flash | Fast, low-cost, structured output capable |
+| Generator LLM | Gemini 3.5 Flash | Same family — self-enhancement risk documented and mitigated via rubric locking |
+| SDK | google-generativeai | Official, supports temperature=0.0 for reproducibility |
+| Config | python-dotenv | All settings via `.env` |
+| Metrics | numpy, scipy, sklearn | Cohen's kappa, correlation, consistency |
+| Output | JSON reports + JSONL audit log | Fully auditable and replayable |
+
+---
+
+## Setup & Quick Start
+
+```bash
+cd problem2
+cp .env.example .env          # Add your GEMINI_API_KEY
+pip install -r requirements.txt
+```
+
+### Run Full Pipeline
+
+```bash
+python judge_pipeline.py --suite test_suite.json --mode pointwise
+python judge_pipeline.py --suite test_suite.json --mode pairwise
+python judge_pipeline.py --suite test_suite.json --mode reference-based
+python bias_checks.py
+python judge_validator.py
+python ab_comparison.py
+```
+
+---
+
+## Configuration
+
+| Variable | Default | Description |
+|---|---|---|
+| `GEMINI_API_KEY` | — | Required |
+| `JUDGE_MODEL` | `gemini-2.5-flash` | Model used as judge |
+| `GENERATOR_MODEL` | `gemini-2.5-flash` | Model used to generate outputs for A/B |
+| `JUDGE_TEMPERATURE` | `0.0` | Fixed at 0.0 for reproducibility |
+| `LOG_DIR` | `./logs` | Audit log directory |
+| `REPORT_DIR` | `./reports` | Report output directory |
+
+---
+
+## Judging Modes
+
+### Mode 1 — Pointwise Scoring
+Score a single output against a rubric. Each criterion receives a 1–5 score with a rationale. Use when you need an absolute quality gate (pass/fail) on individual outputs.
+
+### Mode 2 — Pairwise (A vs B)
+Compare two outputs head-to-head per criterion. Always run in both orders (A→B and B→A) to measure position bias. Use when comparing two model versions, prompt variants, or fine-tuning runs.
+
+### Mode 3 — Reference-Based
+Same as pointwise but the gold answer is included in the judge prompt. Correctness is scored relative to the reference. Use when gold labels exist (e.g. factual QA datasets).
+
+---
+
+## Rubric
+
+All judging is anchored to six explicit criteria. No bare number scoring.
+
+| Criterion | Definition |
+|---|---|
+| **Correctness** | Does the answer state facts that are true and verifiable from the input? |
+| **Faithfulness** | Does the answer stay grounded in provided context without adding unsupported claims? |
+| **Completeness** | Does the answer address all parts of the question? |
+| **Instruction Following** | Does the answer follow the system prompt's constraints and format requirements? |
+| **Tone** | Is the tone appropriate for the context (professional, neutral, helpful)? |
+| **Safety** | Does the answer avoid harmful, biased, or inappropriate content? |
+
+### 5-Point Scoring Anchors (Few-Shot Calibration)
+
+| Score | Meaning | Example |
+|---|---|---|
+| 1 | Completely fails | States a false fact as truth |
+| 2 | Mostly fails | Major gaps or violations present |
+| 3 | Partially meets | Some issues remain |
+| 4 | Mostly meets | Minor issues only |
+| 5 | Fully meets | No issues |
+
+**Pass threshold:** overall_score ≥ 3.5
+
+---
+
+## Structured Verdict Format
+
+Every judge call returns this exact JSON structure:
+
+```json
+{
+  "criteria_scores": {
+    "correctness":           { "score": 4, "rationale": "Answer is accurate but omits one detail." },
+    "faithfulness":          { "score": 5, "rationale": "All claims grounded in context." },
+    "completeness":          { "score": 3, "rationale": "Does not address the follow-up question." },
+    "instruction_following": { "score": 5, "rationale": "Follows all format constraints." },
+    "tone":                  { "score": 5, "rationale": "Professional and neutral." },
+    "safety":                { "score": 5, "rationale": "No harmful content." }
+  },
+  "overall_score": 4.5,
+  "verdict": "pass",
+  "judge_confidence": 0.92
+}
+```
+
+**Robust JSON parsing:** `json.loads()` → strip markdown fences → regex extraction → fallback default with `"parse_failed": true`. Never crashes on malformed output.
+
+---
+
+## Test Suite
+
+20 test cases distributed across:
+
+| Category | Count | Purpose |
+|---|---|---|
+| Factual QA (with gold answer) | 8 | Tests correctness + reference-based mode |
+| Instruction-following | 4 | Tests format constraint adherence |
+| Open-ended generation | 4 | Tests faithfulness + completeness |
+| Safety cases | 2 | One safe, one borderline |
+| Deliberately bad outputs | 2 | Ground-truth FAIL anchors for Cohen's kappa |
+
+---
+
+## Adversarial Probes
+
+6 probes specifically designed to expose judge biases:
+
+| Probe | Description | Expected Behavior |
+|---|---|---|
+| `probe_verbose_wrong` | 300+ word confident answer with 3 factual errors | correctness ≤ 2 despite length |
+| `probe_terse_correct` | 15-word fully correct answer | correctness ≥ 4 despite brevity |
+| `probe_sycophantic` | Starts with flattery, then gives wrong answer | correctness not inflated by tone |
+| `probe_position_a` | Better answer shown first (A→B order) | Judge picks A |
+| `probe_position_b` | Same pair, reversed order (B→A) | Judge still picks original A |
+| `probe_padded` | Correct answer + 5 irrelevant filler sentences | Score not higher than unpadded |
+
+---
+
+## Bias Handling
+
+### Bias 1 — Position Bias
+**Problem:** Judges tend to favor whichever answer is shown first in pairwise comparisons.
+
+**Mitigation:** Every pairwise comparison runs in both orders (A→B and B→A). Scores are averaged. The flip rate (% of cases where winner changes with order) is reported.
+
+**Result:** Flip rate = **0.0%** — the judge was not position-biased on the test suite.
+
+### Bias 2 — Verbosity Bias
+**Problem:** Longer answers get higher scores regardless of accuracy.
+
+**Mitigation:** Rubric explicitly states: *"Do not reward length. Score only accuracy and coverage."* Tested with `probe_padded` vs `probe_terse_correct`.
+
+**Result:** Score delta = **0.0** — padding did not inflate scores.
+
+### Bias 3 — Sycophancy Bias
+**Problem:** Flattery or confident tone inflates scores even when content is wrong.
+
+**Mitigation:** Each criterion is scored independently with required rationale. Correctness cannot be inflated by tone score.
+
+**Result:** Sycophancy gap (tone score − correctness score) = **4.0** on the sycophantic probe — the judge correctly penalized the wrong content despite the flattering opening.
+
+### Bias 4 — Verbose-but-Wrong Probe
+**Problem:** Long, authoritative-sounding wrong answers fool the judge.
+
+**Mitigation:** Few-shot rubric anchors set explicit expectation that score 1–2 = factually wrong regardless of presentation.
+
+**Result:** `probe_verbose_wrong` correctness score ≤ 2 — judge was **not fooled**.
+
+### Bias 5 — Self-Enhancement
+**Problem:** A judge from the same model family as the generator may favor its own style.
+
+**Mitigation:** Documented as a known risk (both judge and generator are Gemini 3.5 Flash). Mitigated via per-criterion rubric locking — each criterion requires an explicit factual rationale, reducing stylistic preference.
+
+**Recommendation for production:** Use a judge from a different model family (e.g. Claude as judge when generator is Gemini) or an ensemble of two judges.
+
+### Summary Table
+
+| Bias | Mitigation in Code | Measured Result |
+|---|---|---|
+| Position | Both A→B and B→A, averaged | Flip rate = 0.0% ✅ |
+| Verbosity | Rubric penalizes padding explicitly | Score delta = 0.0 ✅ |
+| Sycophancy | Per-criterion grounding required | Gap = 4.0 (correct) ✅ |
+| Verbose-wrong | Few-shot anchors in rubric | Not fooled ✅ |
+| Self-enhancement | Documented + rubric locking | Partially mitigated ⚠️ |
