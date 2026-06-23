@@ -1,0 +1,10 @@
+chromadb
+sentence-transformers
+google-generativeai
+fastapi
+uvicorn
+pypdf
+beautifulsoup4
+python-dotenv
+httpx
+numpy

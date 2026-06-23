@@ -1,0 +1,122 @@
+[
+  {
+    "id": "q01",
+    "question": "What is the mathematical equation for scale self-attention in the Transformer architecture?",
+    "relevant_chunk_keywords": ["attention", "softmax", "qk", "d_k"],
+    "gold_answer": "Attention(Q, K, V) = softmax(Q K^T / sqrt(d_k)) V"
+  },
+  {
+    "id": "q02",
+    "question": "What are the three main phases of Reinforcement Learning from Human Feedback (RLHF)?",
+    "relevant_chunk_keywords": ["supervised", "fine-tuning", "reward model", "reinforcement learning"],
+    "gold_answer": "The three main phases of RLHF are Supervised Fine-Tuning (SFT), Reward Model Training, and Reinforcement Learning (RL) using PPO or DPO."
+  },
+  {
+    "id": "q03",
+    "question": "How does a subword tokenizer handle an out-of-vocabulary word?",
+    "relevant_chunk_keywords": ["tokenizer", "subword", "out-of-vocabulary", "uncompromising"],
+    "gold_answer": "A subword tokenizer handles unrecognized words by breaking them down into smaller subword chunks like prefix, root, and suffix (e.g., breaking 'uncompromising' into 'un', 'compromise', and 'ing')."
+  },
+  {
+    "id": "q04",
+    "question": "How does the scale factor sqrt(d_k) in the self-attention formula prevent numerical issues during Transformer training?",
+    "relevant_chunk_keywords": ["scaling", "dot product", "gradients", "vanishing"],
+    "gold_answer": "The scaling factor sqrt(d_k) avoids vanishing gradients by scaling the dot product of the query and key matrices before running softmax."
+  },
+  {
+    "id": "q05",
+    "question": "What is the dimensionality of the all-MiniLM-L6-v2 embedding model?",
+    "relevant_chunk_keywords": ["384", "all-minilm-l6-v2", "dimension"],
+    "gold_answer": "The all-MiniLM-L6-v2 model embeds text into 384 dimensions."
+  },
+  {
+    "id": "q06",
+    "question": "What reinforcement learning algorithm is commonly used in RLHF, and what is its direct optimization alternative?",
+    "relevant_chunk_keywords": ["ppo", "dpo", "preference", "proximal"],
+    "gold_answer": "Proximal Policy Optimization (PPO) is commonly used, and Direct Preference Optimization (DPO) is the direct optimization alternative that skips reward model training."
+  },
+  {
+    "id": "q07",
+    "question": "What is the sliding window approach in RAG chunking and why is overlap important?",
+    "relevant_chunk_keywords": ["sliding window", "overlap", "boundaries", "cut in half"],
+    "gold_answer": "The sliding window approach creates fixed-size chunks with a defined overlap. The overlap ensures that key concepts located at chunk boundaries are not cut in half, preserving context."
+  },
+  {
+    "id": "q08",
+    "question": "What is the Mean Reciprocal Rank (MRR) metric in RAG evaluation?",
+    "relevant_chunk_keywords": ["reciprocal", "rank", "first", "1/r"],
+    "gold_answer": "Mean Reciprocal Rank (MRR) measures the position of the first relevant chunk in search results. The score is 1/r, where r is the rank of the first relevant chunk."
+  },
+  {
+    "id": "q09",
+    "question": "How does Hypothetical Document Embeddings (HyDE) work to improve search?",
+    "relevant_chunk_keywords": ["hyde", "hypothetical", "vector", "syntax"],
+    "gold_answer": "HyDE utilizes an LLM to generate a hypothetical answer to the query, embeds it, and then queries the database. This matches relevant documents that share the same syntax and vocabulary."
+  },
+  {
+    "id": "q10",
+    "question": "What is the difference between a Bi-Encoder and a Cross-Encoder in retrieval?",
+    "relevant_chunk_keywords": ["bi-encoder", "cross-encoder", "reranking", "latency"],
+    "gold_answer": "Bi-encoders encode queries and documents independently and are fast, while Cross-encoders process the query and document together to calculate high-accuracy scores at higher latency."
+  },
+  {
+    "id": "q11",
+    "question": "Why might a system designer choose to use a Cross-Encoder after retrieving items using a Bi-Encoder?",
+    "relevant_chunk_keywords": ["bi-encoder", "cross-encoder", "reranker", "latency", "accuracy"],
+    "gold_answer": "A designer uses a Cross-Encoder to rerank the top results from a Bi-Encoder. This balances speed (fast initial search with Bi-Encoder) and accuracy (detailed ranking with Cross-Encoder)."
+  },
+  {
+    "id": "q12",
+    "question": "What is the definition of Hit Rate @ k in retrieval evaluation?",
+    "relevant_chunk_keywords": ["hit rate", "fraction", "queries", "retrieved"],
+    "gold_answer": "Hit Rate @ k is the fraction of queries for which at least one retrieved chunk contains the correct information (relevance keyword)."
+  },
+  {
+    "id": "q13",
+    "question": "How does the Hierarchical Navigable Small World (HNSW) index speed up vector searches?",
+    "relevant_chunk_keywords": ["hnsw", "graph", "layers", "skip list", "density"],
+    "gold_answer": "HNSW creates a multi-layered graph index. Upper layers contain fewer nodes and longer link distances (like skip lists), and lower layers are denser. Searches start at the top and move down."
+  },
+  {
+    "id": "q14",
+    "question": "What is the main advantage of the Inverted File Index (IVF) over HNSW?",
+    "relevant_chunk_keywords": ["ivf", "centroids", "memory", "hnsw"],
+    "gold_answer": "IVF clusters the vector space into cells and only compares the query against vectors in the closest centroids, which significantly reduces memory consumption compared to HNSW."
+  },
+  {
+    "id": "q15",
+    "question": "Which vector database operates purely in-memory and lacks metadata filtering out of the box?",
+    "relevant_chunk_keywords": ["faiss", "in-memory", "metadata"],
+    "gold_answer": "FAISS (Facebook AI Similarity Search) operates purely in-memory and does not support metadata filtering out of the box."
+  },
+  {
+    "id": "q16",
+    "question": "Why is pgvector advantageous for teams already using PostgreSQL?",
+    "relevant_chunk_keywords": ["pgvector", "postgresql", "acid", "relational"],
+    "gold_answer": "pgvector allows teams to run vector search directly on their existing PostgreSQL databases, preserving ACID transactions and mixing vector search with relational queries."
+  },
+  {
+    "id": "q17",
+    "question": "If you have a self-hosted Chroma database on a $10/month VPS, how many vectors can it comfortably hold?",
+    "relevant_chunk_keywords": ["chroma", "10/month", "2 million", "2m"],
+    "gold_answer": "A self-hosted Chroma database on a basic $10/month VPS can comfortably hold up to approximately 2 million vectors."
+  },
+  {
+    "id": "q18",
+    "question": "What is the capital of France and what is its typical weather in summer?",
+    "relevant_chunk_keywords": ["france", "weather", "paris"],
+    "gold_answer": "No relevant context found."
+  },
+  {
+    "id": "q19",
+    "question": "How do you cook a classic Italian Margherita pizza in a wood-fired oven?",
+    "relevant_chunk_keywords": ["pizza", "dough", "oven"],
+    "gold_answer": "No relevant context found."
+  },
+  {
+    "id": "q20",
+    "question": "What are the trade-offs between self-hosting an embedded database like Chroma versus using a managed database like Pinecone?",
+    "relevant_chunk_keywords": ["chroma", "pinecone", "cost", "sla", "ops"],
+    "gold_answer": "Chroma is highly cost-efficient (e.g. $10/mo self-hosted) but is single-node. Pinecone provides managed infrastructure, SLA, and auto-scaling, but at a higher monthly pod cost."
+  }
+]

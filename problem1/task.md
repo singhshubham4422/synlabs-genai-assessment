@@ -1,0 +1,21 @@
+# Tasks
+
+- [x] Create `.env.example`
+- [x] Create `requirements.txt`
+- [x] Create `config.py`
+- [x] Create `docs/` folder and three MD corpus files
+  - [x] `docs/llm_fundamentals.md`
+  - [x] `docs/rag_architecture.md`
+  - [x] `docs/vector_db_comparison.md`
+- [x] Create `ingest.py`
+- [x] Create `rag_service.py`
+- [x] Create `eval_questions.json`
+- [x] Create `eval_harness.py`
+- [x] Create `cost_comparison.py`
+- [x] Create `README.md`
+- [x] Install dependencies from `requirements.txt`
+- [x] Run ingestion script on docs
+- [x] Start FastAPI RAG service
+- [x] Run evaluation harness and verify results
+- [x] Run cost comparison script to generate markdown analysis
+- [x] Create walkthrough documentation
