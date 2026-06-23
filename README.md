@@ -146,3 +146,101 @@ Metadata filtering is supported on the `/query` endpoint via the `filter` parame
 ```
 2026-06-23T10:42:11 | What is RLHF? | 2788ms | chunks=5 | in=412 | out=138
 ```
+
+---
+
+## Document Corpus
+
+Three Markdown files used as the evaluation corpus:
+
+| File | Topic Coverage |
+|---|---|
+| `docs/llm_fundamentals.md` | Transformers, attention, tokenization, embeddings, RLHF |
+| `docs/rag_architecture.md` | Chunking strategies, vector stores, retrieval metrics, grounding, hallucination, HyDE, reranking |
+| `docs/vector_db_comparison.md` | FAISS, ChromaDB, Pinecone, Weaviate, pgvector, cost, latency, ANN algorithms |
+
+---
+
+## Evaluation Results
+
+Evaluated over a fixed set of 20 questions covering factual lookup, multi-hop reasoning, out-of-scope queries, and ambiguous queries.
+
+### Retrieval Metrics
+
+| Metric | Score | Interpretation |
+|---|---|---|
+| **Hit Rate @ k** | **0.90** | 90% of queries retrieved at least one relevant chunk |
+| **Recall @ k** | **0.8575** | 85.75% of all relevant chunks were retrieved |
+| **MRR** | **0.85** | First relevant chunk appeared at rank 1.18 on average |
+| **nDCG @ k** | **0.8438** | Strong ranking quality; relevant chunks near the top |
+
+### Answer Quality Metrics
+
+| Metric | Score | Interpretation |
+|---|---|---|
+| **Faithfulness** | **0.955** | LLM almost never added facts beyond retrieved chunks |
+| **Answer Relevance** | **0.955** | Answers directly addressed the question asked |
+| **Exact Match (EM)** | 0.10 | Expected low — generative answers rarely match gold strings |
+| **F1 Score** | 0.2092 | Token overlap low by design; generative != extractive |
+
+> **Note on EM/F1:** These metrics are designed for extractive QA (e.g. SQuAD). For generative RAG, low EM/F1 is structurally expected and does not indicate poor quality. The faithfulness and relevance scores (both 0.955) are the meaningful quality signals here.
+
+### Latency
+
+| Metric | Value |
+|---|---|
+| **p50 (median)** | **2788.5 ms** |
+| **p95** | **3312.9 ms** |
+
+Latency breakdown: ~50ms local embedding + ~2700ms Gemini API round trip. Acceptable for a QA service; reducible with async batching or caching repeated queries.
+
+---
+
+## Cost Comparison
+
+### Assumptions
+- Vector dimensionality: 384 (float32 = 4 bytes each)
+- Storage per vector: ~1.7 KB (vector + metadata)
+- Query volume: 50,000 queries/month
+- ChromaDB: self-hosted on a $10/mo VPS (2 vCPU, 4 GB RAM) — holds up to ~2M vectors
+- Pinecone: s1.x1 pod at $0.096/hr, each pod holds ~5M vectors
+- Weaviate: Standard cloud tier, public pricing
+
+| Scale | ChromaDB (self-hosted) | Pinecone (s1.x1) | Weaviate Cloud | Notes |
+|---|---|---|---|---|
+| **100K vectors** | **$10/mo** | $70/mo | $25/mo | Chroma runs on basic VPS; Pinecone requires 1 pod minimum |
+| **1M vectors** | **$10/mo** | $70/mo | $25/mo | Chroma fits in memory on 4 GB VPS; Pinecone 1 pod |
+| **10M vectors** | **$20/mo** | $140/mo | $185/mo | Chroma upgraded to 8 GB VPS; Pinecone needs 2 pods |
+
+ChromaDB is **7x cheaper** than Pinecone at 1M vectors and **7–9x cheaper** at 10M.
+
+### Trade-offs Accepted with ChromaDB
+- No built-in replication or high availability
+- No multi-region support
+- Ops burden falls on your team (backups, scaling)
+- No managed SLA
+
+---
+
+## Design Decisions
+
+**Why ChromaDB over FAISS?** ChromaDB has built-in metadata filtering, persistence without a server process, and a clean Python API. FAISS requires manual index serialization and has no native metadata support.
+
+**SHA256 chunk IDs** enable upsert semantics — re-ingesting the same file is a no-op, not a duplicate insertion.
+
+**No-hallucination guard** skips the LLM entirely when retrieval confidence is low (distance > 0.85). The system admits uncertainty rather than fabricating an answer.
+
+**LLM-as-judge** for faithfulness and relevance uses a separate Gemini call with a strict prompt returning only a float 0–1, minimizing token usage.
+
+---
+
+## Discussion
+
+**When would you switch back to a managed vector DB?**
+At >5M vectors with multi-region requirements, uptime SLAs, or a team without ops bandwidth, the $60–100/mo premium for Pinecone or Weaviate becomes worth it. The break-even point is roughly when the engineering time to maintain the self-hosted setup costs more than the managed service premium.
+
+**Was retrieval or generation the weak link?**
+Retrieval was slightly weaker (Hit Rate 0.90, MRR 0.85) while generation was near-perfect (Faithfulness 0.955). The system occasionally failed to retrieve the right chunk for multi-hop questions requiring context from two documents simultaneously. A reranker or HyDE would address this.
+
+**What single change would most improve answer quality?**
+Adding a reranker (e.g. `cross-encoder/ms-marco-MiniLM-L-6-v2`) between retrieval and generation. The bi-encoder embedding model used here optimizes for recall, not precision. A cross-encoder reranker would improve the quality of the top-3 chunks passed to the LLM.
