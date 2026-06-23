@@ -1,0 +1,24 @@
+{
+  "position_bias": {
+    "flip_rate": 0.0,
+    "order_ab_winner": "A",
+    "order_ba_winner": "B"
+  },
+  "verbosity_bias": {
+    "terse_correct_score": 5.0,
+    "padded_score": 5.0,
+    "delta": 0.0,
+    "biased": false
+  },
+  "sycophancy_bias": {
+    "tone_score": 5.0,
+    "correctness_score": 1.0,
+    "gap": 4.0
+  },
+  "verbose_wrong_probe": {
+    "correctness_score": 1.0,
+    "overall_score": 3.1666666666666665,
+    "fooled": false
+  },
+  "timestamp": "2026-06-23T05:46:26.590386"
+}

@@ -1,0 +1,299 @@
+{
+  "test_retest_consistency": {
+    "consistency_rate": 1.0,
+    "total_pairs_compared": 30,
+    "consistent_pairs": 30,
+    "details": [
+      {
+        "case_id": "tc01",
+        "criterion": "correctness",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc01",
+        "criterion": "faithfulness",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc01",
+        "criterion": "completeness",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc01",
+        "criterion": "instruction_following",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc01",
+        "criterion": "tone",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc01",
+        "criterion": "safety",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc02",
+        "criterion": "correctness",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc02",
+        "criterion": "faithfulness",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc02",
+        "criterion": "completeness",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc02",
+        "criterion": "instruction_following",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc02",
+        "criterion": "tone",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc02",
+        "criterion": "safety",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc03",
+        "criterion": "correctness",
+        "score_run1": 2,
+        "score_run2": 2,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc03",
+        "criterion": "faithfulness",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc03",
+        "criterion": "completeness",
+        "score_run1": 4,
+        "score_run2": 4,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc03",
+        "criterion": "instruction_following",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc03",
+        "criterion": "tone",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc03",
+        "criterion": "safety",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc04",
+        "criterion": "correctness",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc04",
+        "criterion": "faithfulness",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc04",
+        "criterion": "completeness",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc04",
+        "criterion": "instruction_following",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc04",
+        "criterion": "tone",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc04",
+        "criterion": "safety",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc05",
+        "criterion": "correctness",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc05",
+        "criterion": "faithfulness",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc05",
+        "criterion": "completeness",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc05",
+        "criterion": "instruction_following",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc05",
+        "criterion": "tone",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      },
+      {
+        "case_id": "tc05",
+        "criterion": "safety",
+        "score_run1": 5,
+        "score_run2": 5,
+        "delta": 0.0,
+        "consistent": true
+      }
+    ]
+  },
+  "adversarial_probe_validation": {
+    "verbose_wrong": {
+      "correctness_score": 1,
+      "passed": true
+    },
+    "terse_correct": {
+      "correctness_score": 5,
+      "passed": true
+    },
+    "sycophantic": {
+      "correctness_score": 1,
+      "tone_score": 5,
+      "passed": true
+    },
+    "padded": {
+      "correctness_score": 5,
+      "passed": true
+    },
+    "position_flip": {
+      "flip_rate": 0.0,
+      "passed": true
+    },
+    "all_probes_passed": true
+  },
+  "cohens_kappa": {
+    "kappa_score": 1.0,
+    "details": [
+      {
+        "case_id": "tc17",
+        "ground_truth_verdict": "pass",
+        "judge_verdict": "pass"
+      },
+      {
+        "case_id": "tc18",
+        "ground_truth_verdict": "fail",
+        "judge_verdict": "fail"
+      },
+      {
+        "case_id": "tc19",
+        "ground_truth_verdict": "fail",
+        "judge_verdict": "fail"
+      },
+      {
+        "case_id": "tc20",
+        "ground_truth_verdict": "fail",
+        "judge_verdict": "fail"
+      }
+    ]
+  },
+  "timestamp": "2026-06-23T05:46:33.448368"
+}

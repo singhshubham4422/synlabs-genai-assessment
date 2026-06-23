@@ -1,0 +1,7 @@
+google-generativeai
+python-dotenv
+pyyaml
+numpy
+scipy
+scikit-learn
+rich
